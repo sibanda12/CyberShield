@@ -1,0 +1,45 @@
+
+import math
+import string
+
+
+def calculate_entropy(password):
+
+    if not password:
+        return 0.0
+
+    character_pool = 0
+
+    if any(c in string.ascii_lowercase for c in password):
+        character_pool += 26
+
+    if any(c in string.ascii_uppercase for c in password):
+        character_pool += 26
+
+    if any(c in string.digits for c in password):
+        character_pool += 10
+
+    if any(c in string.punctuation for c in password):
+        character_pool += len(string.punctuation)
+
+    if any(not c.isalnum() and c not in string.punctuation
+           for c in password):
+        character_pool += 100
+
+    if character_pool == 0:
+        return 0.0
+
+    entropy = len(password) * math.log2(character_pool)
+
+    return round(entropy, 2)
+
+
+if __name__ == "__main__":
+
+    test_password = input("Enter a test password: ")
+
+    result = calculate_entropy(test_password)
+
+    print("\nCYBERSHIELD ENTROPY ANALYSIS")
+    print("---------------------------")
+    print("Estimated entropy:", result, "bits")
