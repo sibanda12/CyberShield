@@ -1,0 +1,110 @@
+
+import re
+import math
+import string
+from collections import Counter
+
+class CyberShield:
+
+    def __init__(self):
+        self.common_passwords = {
+            "password", "123456", "12345678",
+            "qwerty", "admin", "letmein",
+            "welcome", "password123"
+        }
+
+    def audit(self, password):
+
+        results = {
+            "length": len(password),
+            "uppercase": bool(re.search(r"[A-Z]", password)),
+            "lowercase": bool(re.search(r"[a-z]", password)),
+            "numbers": bool(re.search(r"[0-9]", password)),
+            "special": any(c in string.punctuation for c in password),
+            "common_password": password.lower() in self.common_passwords,
+            "repeated_characters": len(password) != len(set(password))
+        }
+
+        score = 0
+
+        if results["length"] >= 12:
+            score += 2
+        if results["uppercase"]:
+            score += 1
+        if results["lowercase"]:
+            score += 1
+        if results["numbers"]:
+            score += 1
+        if results["special"]:
+            score += 1
+
+        if results["common_password"]:
+            score = 0
+
+        if results["common_password"] or score <= 2:
+            strength = "WEAK"
+        elif score <= 4:
+            strength = "MODERATE"
+        else:
+            strength = "STRONG"
+
+        recommendations = []
+
+        if results["length"] < 12:
+            recommendations.append("Use at least 12 characters.")
+
+        if not results["uppercase"]:
+            recommendations.append("Include uppercase letters.")
+
+        if not results["lowercase"]:
+            recommendations.append("Include lowercase letters.")
+
+        if not results["numbers"]:
+            recommendations.append("Include numbers.")
+
+        if not results["special"]:
+            recommendations.append("Include special characters.")
+
+        if results["common_password"]:
+            recommendations.append("Avoid commonly used passwords.")
+
+        if results["repeated_characters"]:
+            recommendations.append("Avoid excessive character repetition.")
+
+        return {
+            "strength": strength,
+            "score": score,
+            "details": results,
+            "recommendations": recommendations
+        }
+
+
+def main():
+
+    print("=" * 45)
+    print("          CYBERSHIELD AUDITOR")
+    print("       PASSWORD SECURITY ANALYSIS")
+    print("=" * 45)
+
+    password = input("\nEnter a test password: ")
+
+    auditor = CyberShield()
+    report = auditor.audit(password)
+
+    print("\n--- SECURITY REPORT ---")
+    print("Strength:", report["strength"])
+    print("Score:", report["score"], "/ 6")
+
+    print("\n--- RECOMMENDATIONS ---")
+
+    if report["recommendations"]:
+        for recommendation in report["recommendations"]:
+            print("[!] ", recommendation)
+    else:
+        print("[+] Basic password checks passed.")
+
+    print("\n--- AUDIT COMPLETED ---")
+
+
+if __name__ == "__main__":
+    main()
