@@ -1,0 +1,51 @@
+
+import unittest
+from cybershield import CyberShield
+
+
+class TestCyberShield(unittest.TestCase):
+
+    def setUp(self):
+        self.auditor = CyberShield()
+
+    def test_weak_password(self):
+        result = self.auditor.audit("123456")
+        self.assertEqual(result["strength"], "WEAK")
+
+    def test_common_password(self):
+        result = self.auditor.audit("password")
+        self.assertTrue(
+            result["details"]["common_password"]
+        )
+
+    def test_strong_password(self):
+        result = self.auditor.audit("Secure@2026Pass!")
+        self.assertEqual(result["strength"], "STRONG")
+
+    def test_missing_uppercase(self):
+        result = self.auditor.audit("secure@2026pass!")
+        self.assertFalse(
+            result["details"]["uppercase"]
+        )
+
+    def test_missing_numbers(self):
+        result = self.auditor.audit("Secure@Password!")
+        self.assertFalse(
+            result["details"]["numbers"]
+        )
+
+    def test_repeated_characters(self):
+        result = self.auditor.audit("aaaaaaa")
+        self.assertTrue(
+            result["details"]["repeated_characters"]
+        )
+
+    def test_recommendations(self):
+        result = self.auditor.audit("123456")
+        self.assertGreater(
+            len(result["recommendations"]), 0
+        )
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
